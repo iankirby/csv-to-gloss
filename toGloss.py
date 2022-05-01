@@ -18,10 +18,10 @@ with open(examples,encoding="utf8") as f:
 
 
 examples=re.sub(",\s*",",",examples) #removes spaces after commas
-examples=re.sub("[\s]*,",",",examples)#removes spaces before commas
+# examples=re.sub("[\s]*,",",",examples)#removes spaces before commas
 examples=re.split("\n",examples)
 
-print(len(examples))
+
 ex=[]
 i=0
 while(i<len(examples)):
@@ -35,6 +35,11 @@ while(i<len(examples)):
     i+=1
 print(ex)
 # print(len(ex))
+
+# i=0
+# line_two=[]
+# while (i<len(examples)):
+    
 
 #read in the latex template that will be read
 tex_in=open("./In/template.tex","r+",encoding="utf8")
@@ -76,9 +81,9 @@ print(len(ex))
 i=0
 while(i<len(ex)):
     temp=ex[i]
-    tex_out.write("\\exg."+temp[0]+temp[1]+"\\\\\n"+temp[2]+"\\\\\n"+"`"+temp[3]+"'\n\n")
+    tex_out.write('\\'+"exg."+temp[0]+temp[1]+"\\\\\n"+temp[2]+"\\\\\n"+"`"+temp[3]+"\n\n")
     i=i+1
-tex_out.write(end_document)
+tex_out.write('\\'+"end"+'{'+"document"+"}")
 
 
 
