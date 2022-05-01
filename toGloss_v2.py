@@ -29,7 +29,7 @@ def check_file_structure():
         i=i+1
     if (check_in==False):
        
-        webbrowser.open("https://github.com/iankirby/csv-to-gloss", new=2)
+        webbrowser.open("https://github.com/iankirby/csv-to-gloss#required-file-structure-for-contents", new=2)
         sys.exit("You have called this program in a directory that does not contain the correct file structure!  Opening documentation...")
 
     if (check_out==False):
