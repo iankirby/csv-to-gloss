@@ -1,4 +1,4 @@
-import re, subprocess, os, datetime, csv, sys, webbrowser
+import re, subprocess, os, datetime, csv, sys
 
 
 def check_command_line_args():
@@ -18,19 +18,21 @@ def check_file_structure():
 
     dir=os.listdir(".") #list of files in the current directory.
 
-    check_in, check_out= False, False
+    #check to see that the right files are there, and if they're not, it will create the files.
+    check_key, check_tex, check_out= False, False, False
     i=0
     while (i<len(dir)):
-        if (dir[i]=="In"):
+        if (dir[i]=="Tex_Templates"):
             check_in=True
-        if (dir[i]=="Out"):
+        if (dir[i]=="Output"):
             check_out=True
-        
         i=i+1
-    if (check_in==False):
-       
-        webbrowser.open("https://github.com/iankirby/csv-to-gloss#required-file-structure-for-contents", new=2)
-        sys.exit("You have called this program in a directory that does not contain the correct file structure!  Opening documentation...")
+    
+    if (check_key==False):
+        os.mkdir("Keys")
+
+    
+    if (check_tex==False):
 
     if (check_out==False):
         os.mkdir("Out")

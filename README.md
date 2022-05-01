@@ -8,17 +8,17 @@ python csv-to-gloss.py EXAMPLES.csv --k <glossKey>.csv --t
 
 ## Required file structure for contents
 
+
 ```
 csv-to-gloss
 |   toGloss.py
-├───In
-|       
-|       template.tex
-|       transcriptionKey.csv
-├───Out
+├───Keys
+|      transcriptionKey.csv 
+├───Output
+├───Tex_Templates
 ```
 
-**DO NOT NOT delete the **
+**DO NOT NOT DELETE THE CONTENTS OF THE FILE *In***
 
 ## Setting up your glosses:
 
