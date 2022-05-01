@@ -1,117 +1,236 @@
-import re, sys, os, subprocess, datetime,csv
+import re, subprocess, os, datetime, csv, sys
+from urllib.request import urlopen
 
 
-#These are the default values.  Currently this only accepts a single command line argument, being the csv.
-glossKey="./In/glossKey.csv"
-template="./In/template.tex"
-trnsKey="./in/trnsKey.csv"
 
-if(len(sys.argv)>2):
-    sys.exit("Multiple command line arguments not supported.  Dying")
-elif(len(sys.argv)==2):
-    examples="examples.csv"
-else:
-    examples="examples.csv"
-
-with open(examples,encoding="utf8") as f:
-    examples=f.read()+"\n"
+def print_out_array(ex):
 
 
-examples=re.sub(",\s*",",",examples) #removes spaces after commas
-# examples=re.sub("[\s]*,",",",examples)#removes spaces before commas
-examples=re.split("\n",examples)
-
-
-ex=[]
-i=0
-while(i<len(examples)):
-    temp=examples[i]
-    print(temp)
-    temp=re.split(",",temp)
-    if(len(temp)>1):
-        if(temp[0]==''):
-            temp[0]=temp[0]+" "
-        ex.append(temp)
-    i+=1
-print(ex)
-# print(len(ex))
-
-# i=0
-# line_two=[]
-# while (i<len(examples)):
+    #find the date and time that the script was called
+    d=datetime.datetime.utcnow()
+    dm="{:%h%d}".format(d)
+    dm=dm+"-"
+    hm="{:%H%M}".format(d)
+    time_got=dm+hm
     
 
-#read in the latex template that will be read
-tex_in=open("./In/template.tex","r+",encoding="utf8")
-x=tex_in.read()
-tex_in.close()
+    out_name="./Output/output_"+time_got+".tex"
 
-# begin="%% Beginning of commands"
-# end="\%\% End of commands"
-# x=re.split(begin,x)
+    tex_out=open(out_name,"a",encoding="utf8")
+    # tex_out.truncate(0)
 
-# head=x[0]+"\n"+begin
+    
 
-# begin_document="\\begin\{document\}"
-# x=re.split(begin_document,x)
-
-# head=x[0]+"\n"+begin_document
-# tail=x[1]
-
-end_document=r'\\end\{document\}'
-head=re.split(end_document,x)
-head=head[0]+"\n"
+    template="./Tex_Templates/template.tex"
+    file=open(template,'r',encoding="utf8")
+    template=file.read()
+    file.close()
+    template=re.sub(r'\\end{document}',"",template) #strip off the end of the document
+    # print(template)
 
 
-#Find the time that the script was called
-d=datetime.datetime.utcnow()
-dm="{:%h%d}".format(d)
-dm=dm+"-"
-hm="{:%H%M}".format(d)
-time_got=dm+hm
+    tex_out.write(template+"\n\n")
 
-out_name="./Out/outputfile_"+time_got+".tex"
-
-tex_out=open(out_name,"a",encoding="utf8")
-tex_out.truncate(0) #
-tex_out.write(head+"\n")
-
-# tex_out.write(head)
-print(len(ex))
-i=0
-while(i<len(ex)):
-    temp=ex[i]
-    tex_out.write('\\'+"exg."+temp[0]+temp[1]+"\\\\\n"+temp[2]+"\\\\\n"+"`"+temp[3]+"\n\n")
-    i=i+1
-tex_out.write('\\'+"end"+'{'+"document"+"}")
+    i=0
+    while(i<len(ex)):
+        curr=ex[i]
+        tex_out.write(curr[0]+"\n"+curr[1]+"\n"+curr[2]+"\n\n")
+        # # top=curr[0]
+        # middle=curr[1]
+        # bottom=curr[2]
+        i=i+1
+    tex_out.write("\\"+"end{document"+"}")
+    tex_out.close()
 
 
 
+# def format_examples_and_add(ex,tex):
 
-#This stuff is for later
-##################################
-# Read in the gloss key list
-# gloss_in=open("./In/glossKey.csv","r",encoding="utf8")
-# glossKey=gloss_in.read()
-# gloss_in.close()
+def check_glossKey():
+    print("this is not complete yet")
 
 
+#For testing
+def temp_read_examples():
+    examples=sys.argv[1]
+    file=open(examples,"r",encoding="utf8")
+    examples=file.read()
+    file.close()
+    # print(examples)
 
-# glossKey=re.sub("\n\n","",glossKey) #Remove empty lines
-# glossKey=re.sub(",\s*",",",glossKey) #remove any spaces after comma
-# glossKey=re.split("\n",glossKey)
+    examples=re.split("\n",examples)
+    new_ex=[]
+    i=0
+    while (i<len(examples)):
+        curr_line=examples[i]
+        curr_line=re.split(",",curr_line)
+        # print(curr_line)
+        if (len(curr_line)>1):
+            new_ex.append(curr_line)
+            # print(curr_line)
+        i=i+1
+    
+    
 
 
-#This code is for adding special commands.  it's not ready yet
-# glossKey2=[]
-# i=0
-# while(i<len(glossKey)):
-#     temp=glossKey[i]
-#     if(re.search(",",temp)==False):
-#         temp=temp+","
-#     temp=re.split(",",temp)
-#     glossKey2.append(temp)
-#     if(temp[1]!=''):
-#         tex_out.write("\\newcommand{\\"+temp[0]+"}{"+temp[1]+"}")
-#         tex_out.write("\n")
-#     i=i+1
+    transcription_key="./Keys/transcriptionKey.csv"
+    file=open(transcription_key,"r",encoding="utf8")
+    transcription_key=file.read()
+    file.close()
+    transcription_key=re.split("\n",transcription_key)
+    # print(transcription_key)
+    i=0
+    transcription_new=[]
+    while (i<len(transcription_key)):
+        curr=transcription_key[i]
+        if(len(curr)>1):
+            curr=re.split(",",curr)
+
+            #get rid of any empty spaces at the beginning of the string...
+            tmp=curr[1]
+            if(tmp[0]==' '):
+                tmp=tmp[1:]
+                curr.pop(1)
+                curr.append(tmp)
+            #now check to see if the element ends in braces.  Add them around the whole thing if not.
+
+            tmp=curr[1]
+            if(tmp[-1]!="}"):
+                curr.pop(1)
+                tmp="{"+tmp+"}"
+                curr.append(tmp)
+            transcription_new.append(curr)
+        i=i+1
+    # print(transcription_new)
+
+    ex=[]
+    i=0
+    while (i<len(new_ex)):
+        
+        out_ex=[]
+        curr_ex=new_ex[i]
+        jdg=curr_ex[0]
+        if (len(jdg)!=0 and jdg=="#"):
+            jdg="\\#"
+        top_line=curr_ex[1]
+        # print(top_line)
+        if ((len(top_line)!=0) and top_line[0]==' '):
+            top_line=top_line[1:]
+        top_line="\\exg."+jdg+top_line+"\\\\"
+        # print(top_line)
+
+        #Here is where I will need to deal with transcription stuff
+        j=0
+        while (j<len(transcription_new)):
+            curr_trns=transcription_new[j]
+            pat, repl =curr_trns[0], repr(curr_trns[1])
+            top_line=re.sub(pat, repl,top_line)
+            # print(x)
+            j=j+1
+        top_line=re.sub('\'','',top_line)
+        out_ex.append(top_line)
+        # print(top_line)
+
+
+        middle_line=curr_ex[2]
+        #get rid of first space, if there is one
+        if(len(middle_line)>1 and middle_line[0]==' '):
+            middle_line=middle_line[1:]
+        
+        middle_as_array=re.split("(\W)",middle_line)
+        # print(middle_as_array)
+      
+        # print(middle_as_array)
+        middle_new=""
+        j=0
+        while (j<len(middle_as_array)):
+            curr_word=middle_as_array[j]
+            if(str.isupper(curr_word)):
+                curr_word="\\textsc{"+str.lower(curr_word)+"}"
+            middle_new=middle_new+curr_word
+            j=j+1
+        middle_new=re.sub(' - ','-',middle_new)
+        middle_new=re.sub(' = ','=',middle_new)
+        middle_new=re.sub(' \. ', '.',middle_new)
+        middle_new=middle_new+"\\\\"
+        # middle_new=re.sub('(\w\w)', ' ', middle_new)
+        # print(middle_new)
+        out_ex.append(middle_new)
+
+
+        bottom_line=curr_ex[3]
+        if(len(bottom_line)>1 and bottom_line[0]==' '):
+            bottom_line=bottom_line[1:]
+        bottom_line="`"+bottom_line+"'"
+        # print(bottom_line)
+        out_ex.append(bottom_line)
+
+        ex.append(out_ex)
+        i=i+1
+    print_out_array(ex)
+    # print(ex)
+
+#Check to see if there are command line arguments, and if so, verify that they are in the file structure...
+def check_command_line_args():
+    
+    dir=os.listdir('.')
+    tex_dir=os.listdir('./Tex_Templates')
+    key_dir=os.listdir('./Keys')
+
+    if (len(sys.argv)==1):
+        sys.exit("You did not specify an example file.")
+    elif (len(sys.argv)>1):
+        x=sys.argv[1]
+        if ((not len(x)>3) or (x[-4:]!=".csv")):
+            print("hi")
+
+
+
+#Verifying that the file structure includes In, Out
+def check_file_structure():
+
+    dir=os.listdir(".") #list of files in the current directory.
+
+    #check to see that the right files are there, and if they're not, it will create the files.
+    check_key, check_tex, check_out= False, False, False
+    i=0
+    while (i<len(dir)):
+        if (dir[i]=="Tex_Templates"):
+            check_tex=True
+        if (dir[i]=="Keys"):
+            check_key=True
+        if (dir[i]=="Output"):
+            check_out=True
+        i=i+1
+    
+    if (check_key==False):
+        os.mkdir("Keys")
+        print("See documentation on how to use keys.")
+    if (check_out==False):
+        os.mkdir("Out")
+
+    
+    if (check_tex==False):
+        os.mkdir("Tex_Templates")
+
+    texDir=os.listdir('./Tex_Templates')
+    has_linguex=False
+    i=0
+    while (i<len(texDir)):
+        if (texDir[i]=="template_linguex.tex"):
+            has_linguex=True
+        i=i+1
+    if (has_linguex==False):
+
+        file=open("Tex_Templates/template_linguex.tex","a", encoding="utf8")
+        # file=file.read()
+        template="\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage{tipa}\n\\usepackage{textgreek}\n\\usepackage{pifont}\n\\usepackage{linguex}\n\n\\begin{document}\n\n\\end{document}"
+
+
+        file.write(template)
+        file.close() 
+
+    # check_command_line_args()
+    temp_read_examples()
+
+check_file_structure()
