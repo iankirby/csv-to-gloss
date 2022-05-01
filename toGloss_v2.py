@@ -2,8 +2,13 @@ import re, subprocess, os, datetime, csv
 
 
 def check_sys_argv():
-    i=1
-    while(i<len(sys.argv)):
+    #First, check to see if the first command line argument is a csv.
+    if (len(sys.argv)!>1):
+        print("hi")
+   
+
+
+
 
 
 
