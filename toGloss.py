@@ -3,7 +3,7 @@ from urllib.request import urlopen
 
 
 
-def print_out_array(ex):
+def print_out_array(ex,tex):
 
 
     #find the date and time that the script was called
@@ -14,14 +14,14 @@ def print_out_array(ex):
     time_got=dm+hm
     
 
-    out_name="./Output/output_"+time_got+".tex"
+    out_name="Output/output_"+time_got+".tex"
 
     tex_out=open(out_name,"a",encoding="utf8")
     # tex_out.truncate(0)
 
     
 
-    template="./Tex_Templates/template.tex"
+    template="./Tex_Templates/"+tex
     file=open(template,'r',encoding="utf8")
     template=file.read()
     file.close()
@@ -29,7 +29,7 @@ def print_out_array(ex):
     # print(template)
 
 
-    tex_out.write(template+"\n\n")
+    tex_out.write(template+"\n")
 
     i=0
     while(i<len(ex)):
@@ -42,7 +42,7 @@ def print_out_array(ex):
     tex_out.write("\\"+"end{document"+"}")
     tex_out.close()
 
-
+    print("Script written by Ian Kirby.  Thank you for using it.")
 
 # def format_examples_and_add(ex,tex):
 
@@ -50,8 +50,8 @@ def check_glossKey():
     print("this is not complete yet")
 
 
-#For testing
-def temp_read_examples():
+#This is a loop that does most of the work here...
+def temp_read_examples(examples,tkey,template):
     examples=sys.argv[1]
     file=open(examples,"r",encoding="utf8")
     examples=file.read()
@@ -73,7 +73,7 @@ def temp_read_examples():
     
 
 
-    transcription_key="./Keys/transcriptionKey.csv"
+    transcription_key="./Keys/"+tkey
     file=open(transcription_key,"r",encoding="utf8")
     transcription_key=file.read()
     file.close()
@@ -152,6 +152,7 @@ def temp_read_examples():
         middle_new=re.sub(' - ','-',middle_new)
         middle_new=re.sub(' = ','=',middle_new)
         middle_new=re.sub(' \. ', '.',middle_new)
+        # print(middle_new)
         middle_new=middle_new+"\\\\"
         # middle_new=re.sub('(\w\w)', ' ', middle_new)
         # print(middle_new)
@@ -167,8 +168,11 @@ def temp_read_examples():
 
         ex.append(out_ex)
         i=i+1
-    print_out_array(ex)
+    print_out_array(ex,template)
     # print(ex)
+
+# def check_key():
+#     print("hi")
 
 #Check to see if there are command line arguments, and if so, verify that they are in the file structure...
 def check_command_line_args():
@@ -177,16 +181,74 @@ def check_command_line_args():
     tex_dir=os.listdir('./Tex_Templates')
     key_dir=os.listdir('./Keys')
 
+    #default location for key, etc
+    tkey="transcriptionKey.csv"
+    tex="template.tex"
+    
+
     if (len(sys.argv)==1):
         sys.exit("You did not specify an example file.")
-    elif (len(sys.argv)>1):
+    elif (len(sys.argv)>1 and len(sys.argv[1])>4):
         x=sys.argv[1]
-        if ((not len(x)>3) or (x[-4:]!=".csv")):
-            print("hi")
+        i=0
+        while (i<len(dir)):
+            if (x==dir[i]):
+                break
+            else:
+                i=i+1
+        else:
+            print("I did not find a file titled: \""+x+"\" in the current directory.  Please include your example spreadsheet in the same file as toGloss.py!")
+            sys.exit()
+    #Checking the other command line arguments.
+
+    error="Mistake in command line arguments.  The relevant keys tags are:\n\"-tkey\" for your transcription key\n\"-tex\" for your tex template\n\"-gkey\" for glossing key.\n Alternatively, perhaps you forgot to enter the name of the file afterwards?"
+    no_glossing_key="\nNote that the glossing key functionality is not currently active."
+    error_bool=False
+   
+    if (len(sys.argv)>2):
+        if((len(sys.argv)%2)!=0):
+            sys.exit(error+no_glossing_key)
+        else:
+            i=2
+            while (i<len(sys.argv)):
+                if (sys.argv[i]=="-tkey"):
+                    tkey=sys.argv[i+1]
+                    j=0
+                    while (j<len(key_dir)):
+                        if (tkey==key_dir[j]):
+                            break
+                        else:
+                            j=j+1
+                    else:
+                        print("I didn't not find \""+tkey+"\" in your Key subdirectory.  Perhaps you mistyped it or put it in another file?")
+                        error_bool=True
+                elif(sys.argv[i]=="-tex"):
+                    tex=sys.argv[i+1]
+                    j=0
+                    while (j<len(tex_dir)):
+                        if(tex==tex_dir[j]):
+                            break
+                        else:
+                            j=j+1
+                    else:
+                        print("I did not find \""+tex+"\" in your Tex_Template subdirectory.  Perhaps you mistyped it or put it in another file?")
+                        error_bool=True
+                elif(sys.argv[i]=="-gkey"):
+                    print(no_glossing_key+" So I am ignoring "+sys.argv[i]+" "+sys.argv[i+1])
+                else:
+                    print("I do not recognize tag \""+sys.argv[i]+"\"")
+                    sys.exit(error+no_glossing_key)
+
+                i=i+2
+    if(error_bool==True):
+        sys.exit()
+    else:
+        temp_read_examples(sys.argv[1],tkey,tex)
+    #verify that this file is in the directory...    
 
 
 
-#Verifying that the file structure includes In, Out
+#Verifying that the file structure includes proper subdirectories, create them if not.
 def check_file_structure():
 
     dir=os.listdir(".") #list of files in the current directory.
@@ -205,7 +267,11 @@ def check_file_structure():
     
     if (check_key==False):
         os.mkdir("Keys")
-        print("See documentation on how to use keys.")
+        file=open("./Keys/transcriptionKey.csv","a",encoding="utf8")
+        file.close()
+        file=open("./Keys/glossKey.csv","a",encoding="utf8")
+        file.close()
+        # print("See documentation on how to use keys.")
     if (check_out==False):
         os.mkdir("Out")
 
@@ -217,12 +283,12 @@ def check_file_structure():
     has_linguex=False
     i=0
     while (i<len(texDir)):
-        if (texDir[i]=="template_linguex.tex"):
+        if (texDir[i]=="template.tex"):
             has_linguex=True
         i=i+1
     if (has_linguex==False):
 
-        file=open("Tex_Templates/template_linguex.tex","a", encoding="utf8")
+        file=open("Tex_Templates/template.tex","a", encoding="utf8")
         # file=file.read()
         template="\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage{tipa}\n\\usepackage{textgreek}\n\\usepackage{pifont}\n\\usepackage{linguex}\n\n\\begin{document}\n\n\\end{document}"
 
@@ -230,7 +296,7 @@ def check_file_structure():
         file.write(template)
         file.close() 
 
-    # check_command_line_args()
-    temp_read_examples()
+    check_command_line_args()
+    # temp_read_examples()
 
 check_file_structure()
