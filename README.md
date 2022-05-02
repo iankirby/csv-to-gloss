@@ -20,6 +20,10 @@ It will then output a ```.tex``` file, in the Output folder.
 * <br>![tex file pdf](/development/images/output.png)
 
 
+## Running the script
+
+All you have to download [toGloss.py](/toGloss.py).  Save it in a directory.  It will create any necessary subdirectories whenever you run it.
+
 ## Formatting your data
 
 * use all caps in your CSV for morphemes.
@@ -39,7 +43,7 @@ Please save any additional templates in the relevant subdirectories (```Tex_Temp
 ## The file structure
 
 * this is currently in a state that I would describe as "working but not optimal".  You should store it in a directory with the following structure:
-* If you call the script in a directory wihtout these subdirectories, it will creat them for you.
+* If you call the script in a directory without these subdirectories, it will create them for you.
 
 ```
 Directory
