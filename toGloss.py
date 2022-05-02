@@ -273,7 +273,7 @@ def check_file_structure():
         file.close()
         # print("See documentation on how to use keys.")
     if (check_out==False):
-        os.mkdir("Out")
+        os.mkdir("Output")
 
     
     if (check_tex==False):
