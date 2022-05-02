@@ -13,16 +13,17 @@ To call the script, first command line argument is the ```.csv``` file consistin
 python toGloss.py examples.csv
 ```
 
-It will then output a ```.tex``` file:
+It will then output a ```.tex``` file, in the Output folder.
 
-![tex file code](/development/images/tex%20output.png)
+* <Br>![tex file code](/development/images/tex%20output.png)
 
-![tex file pdf](/development/images/output.png)
+* <br>![tex file pdf](/development/images/output.png)
 
 
 ## Formatting your data
 
 * use all caps in your CSV for morphemes.
+* do not make headers in yoru CSV files
 
 ## The file structure
 
@@ -35,7 +36,7 @@ Directory
 ├───Keys
 |       transcriptionKey.csv
 ├───Output
-|
+|       
 └───Tex_Templates
         template.tex
 ```
