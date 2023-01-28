@@ -11,6 +11,7 @@ window=tk.Tk()
 window.title('csv-to-text')
 window.geometry("400x300+10+10")
 
+#Button for selecting exmaple file.
 
 def select_file():
     filetypes=(
@@ -87,12 +88,12 @@ open_glossing=ttk.Button(
 open_glossing.pack(expand=True)
 
 
-# v0=IntVar()
-# v0.set(1)
-# l1=Radiobutton(window,text="linguex",variable=v0,value=1)
-# l2=Radiobutton(window,text="gb4e",variable=v0, value=2)
-# l1.place(x=150,y=100)
-# l2.place(x=2040,y=100)
+v0=IntVar()
+v0.set(1)
+l1=Radiobutton(window,text="linguex",variable=v0,value=1)
+l2=Radiobutton(window,text="gb4e",variable=v0, value=2)
+l1.place(x=150,y=100)
+l2.place(x=2040,y=100)
 
 
 
